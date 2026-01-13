@@ -66,9 +66,15 @@ public class AppointmentService {
         boolean isDoctor = hasRole("DOCTOR");
         boolean isReceptionist = hasRole("RECEPTIONIST");
 
-        // Rule: RECEPTIONIST cannot update completed appointments
-        if (isReceptionist && appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new BusinessException("Receptionists cannot update completed appointments");
+        if (isReceptionist) {
+            if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
+                throw new BusinessException("Receptionists cannot update completed appointments");
+            }
+            if (request.getStatus() == null || request.getStatus() != AppointmentStatus.CANCELED) {
+                throw new BusinessException("Receptionists can only cancel appointments");
+            }
+            appointment.setStatus(AppointmentStatus.CANCELED);
+            return mapToResponse(repository.save(appointment));
         }
 
         // Rule: DOCTOR can only update status

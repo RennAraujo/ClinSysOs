@@ -67,6 +67,25 @@ export default function Dashboard() {
     if (current === 'IN_PROGRESS') return 'COMPLETED';
     return current;
   };
+  const handleCancel = async (app) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (app.status === 'COMPLETED' || app.status === 'CANCELED') return;
+      await axios.put(`http://localhost:8080/api/appointments/${app.id}`, {
+        patientName: app.patientName,
+        doctorName: app.doctorName,
+        specialty: app.specialty,
+        dateTime: app.dateTime,
+        status: 'CANCELED'
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchAppointments();
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Erro ao cancelar agendamento.';
+      alert(msg);
+    }
+  };
 
   const handleChangeStatus = async (app) => {
     try {
@@ -211,13 +230,23 @@ export default function Dashboard() {
                       </span>
                     </td>
                     <td className="border-b p-2 space-x-2">
-                      <button
-                        onClick={() => handleChangeStatus(app)}
-                        className="px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:opacity-50"
-                        disabled={!canUpdateStatus(app.status) || app.status === 'COMPLETED' || app.status === 'CANCELED'}
-                      >
-                        Alterar status
-                      </button>
+                      {userRole === 'RECEPTIONIST' ? (
+                        <button
+                          onClick={() => handleCancel(app)}
+                          className="px-2 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600 disabled:opacity-50"
+                          disabled={app.status === 'COMPLETED' || app.status === 'CANCELED'}
+                        >
+                          Cancelar
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleChangeStatus(app)}
+                          className="px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:opacity-50"
+                          disabled={!canUpdateStatus(app.status) || app.status === 'COMPLETED' || app.status === 'CANCELED'}
+                        >
+                          Alterar status
+                        </button>
+                      )}
                       <button
                         onClick={() => handleDelete(app.id)}
                         className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 disabled:opacity-50"
