@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [newDate, setNewDate] = useState('');
   const [userRole, setUserRole] = useState('');
   const formRef = useRef(null);
+  const formElementRef = useRef(null);
   const firstInputRef = useRef(null);
   const navigate = useNavigate();
   const formatId = (id) => (id ? String(id) : '');
@@ -58,7 +59,13 @@ export default function Dashboard() {
         headers: { Authorization: `Bearer ${token}` }
       });
       const sorted = Array.isArray(response.data)
-        ? response.data.slice().sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime))
+        ? response.data
+            .slice()
+            .sort((a, b) => {
+              const diff = new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime();
+              if (diff !== 0) return diff;
+              return String(a.id).localeCompare(String(b.id));
+            })
         : [];
       setAppointments(sorted);
     } catch (err) {
@@ -154,8 +161,28 @@ export default function Dashboard() {
     navigate('/login');
   };
   const handleScheduleClick = () => {
+    const formEl = formElementRef.current;
     if (formRef.current) {
       formRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+    if (formEl && typeof formEl.checkValidity === 'function') {
+      const valid = formEl.checkValidity();
+      if (valid) {
+        if (typeof formEl.requestSubmit === 'function') {
+          formEl.requestSubmit();
+        } else {
+          formEl.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
+        return;
+      }
+      if (typeof formEl.reportValidity === 'function') {
+        formEl.reportValidity();
+      }
+      const firstInvalid = formEl.querySelector(':invalid');
+      if (firstInvalid && typeof firstInvalid.focus === 'function') {
+        firstInvalid.focus();
+        return;
+      }
     }
     if (firstInputRef.current) {
       firstInputRef.current.focus();
@@ -189,7 +216,7 @@ export default function Dashboard() {
         {canCreate && (
           <div ref={formRef} className="bg-white p-6 rounded-lg shadow mb-8">
             <h2 className="text-xl font-semibold mb-4">Novo Agendamento</h2>
-            <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <form ref={formElementRef} onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <input ref={firstInputRef} type="text" placeholder="Nome do Paciente" value={newPatient} onChange={(e) => setNewPatient(e.target.value)} required
                 className="border p-2 rounded" />
               <input type="text" placeholder="Nome do Médico" value={newDoctor} onChange={(e) => setNewDoctor(e.target.value)} required
@@ -198,7 +225,6 @@ export default function Dashboard() {
                 className="border p-2 rounded" />
               <input type="datetime-local" value={newDate} onChange={(e) => setNewDate(e.target.value)} required
                 className="border p-2 rounded" />
-              <button type="submit" className="bg-green-500 text-white p-2 rounded hover:bg-green-600">Agendar</button>
             </form>
           </div>
         )}
@@ -206,25 +232,27 @@ export default function Dashboard() {
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Agendamentos</h2>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="min-w-full table-fixed border-collapse">
               <thead>
                 <tr>
-                  <th className="border-b p-2">ID</th>
-                  <th className="border-b p-2">Paciente</th>
-                  <th className="border-b p-2">Médico</th>
-                  <th className="border-b p-2">Data/Hora</th>
-                  <th className="border-b p-2">Status</th>
-                  <th className="border-b p-2">Ações</th>
+                  <th className="border-b p-2 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">ID</th>
+                  <th className="border-b p-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Paciente</th>
+                  <th className="border-b p-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Médico</th>
+                  <th className="border-b p-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Especialidade</th>
+                  <th className="border-b p-2 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Data/Hora</th>
+                  <th className="border-b p-2 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                  <th className="border-b p-2 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {appointments.map((app, idx) => (
                   <tr key={app.id} className="hover:bg-gray-50">
-                    <td className="border-b p-2">{idx + 1}</td>
-                    <td className="border-b p-2">{app.patientName}</td>
-                    <td className="border-b p-2">{app.doctorName}</td>
-                    <td className="border-b p-2">{new Date(app.dateTime).toLocaleString()}</td>
-                    <td className="border-b p-2">
+                    <td className="border-b p-2 text-center">{idx + 1}</td>
+                    <td className="border-b p-2 text-left">{app.patientName}</td>
+                    <td className="border-b p-2 text-left">{app.doctorName}</td>
+                    <td className="border-b p-2 text-left">{app.specialty}</td>
+                    <td className="border-b p-2 text-center whitespace-nowrap">{new Date(app.dateTime).toLocaleString()}</td>
+                    <td className="border-b p-2 text-center">
                       <span className={`px-2 py-1 rounded text-sm ${
                         app.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
                         app.status === 'CANCELED' ? 'bg-red-100 text-red-800' :
@@ -233,7 +261,7 @@ export default function Dashboard() {
                         {app.status}
                       </span>
                     </td>
-                    <td className="border-b p-2 space-x-2">
+                    <td className="border-b p-2 text-right space-x-2">
                       {(userRole === 'ADMIN' || userRole === 'DOCTOR') && (
                         <button
                           onClick={() => handleChangeStatus(app)}
@@ -264,7 +292,7 @@ export default function Dashboard() {
                 ))}
                 {appointments.length === 0 && (
                   <tr>
-                    <td colSpan="6" className="p-4 text-center text-gray-500">Nenhum agendamento encontrado.</td>
+                    <td colSpan="7" className="p-4 text-center text-gray-500">Nenhum agendamento encontrado.</td>
                   </tr>
                 )}
               </tbody>

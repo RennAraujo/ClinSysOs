@@ -2,6 +2,8 @@
 
 Sistema de gerenciamento de atendimentos para a clínica Vida Plena, integrando Backend (Spring Boot) e Frontend (React).
 
+> **Note:** The codebase (variables, comments, JavaDocs) has been refactored to English for international standardization.
+
 ## 🚀 Tecnologias
 
 ### Backend
@@ -9,7 +11,7 @@ Sistema de gerenciamento de atendimentos para a clínica Vida Plena, integrando 
 - **Spring Boot 3**
 - **PostgreSQL**
 - **Spring Security + JWT**
-- **Swagger / OpenAPI**
+- **Swagger / OpenAPI** (Documentation in English)
 
 ### Frontend
 - **React + Vite**
@@ -55,7 +57,7 @@ O sistema utiliza JWT. O primeiro passo é criar um usuário (ou usar um existen
 | Perfil | Permissões |
 |--------|------------|
 | **ADMIN** | Acesso total (Criar, Listar, Editar, Remover, Alterar Status). |
-| **RECEPTIONIST** | Criar e Listar. Não pode remover ou editar finalizados. |
+| **RECEPTIONIST** | Criar e Listar. Não pode remover ou editar finalizados. Apenas cancela. |
 | **DOCTOR** | Listar e Atualizar Status. Não pode criar ou remover. |
 
 ### Fluxo de Uso (Frontend)
@@ -64,10 +66,12 @@ O sistema utiliza JWT. O primeiro passo é criar um usuário (ou usar um existen
 2. Clique em "Criar conta" para registrar um novo usuário (ex: `admin` / role `ADMIN`).
 3. Faça login com as credenciais criadas.
 4. No Dashboard, você poderá:
-   - Criar novos agendamentos.
-   - Visualizar a lista de agendamentos.
-   - Alterar o status (SCHEDULED → IN_PROGRESS → COMPLETED).
-   - Excluir agendamentos (Apenas ADMIN).
+   - **Agendar**: Preencha os campos (Paciente, Médico, Especialidade, Data) e clique em "Agendar" no topo.
+   - **Visualizar**: Lista com ID, Paciente, Médico, Especialidade, Data/Hora e Status.
+   - **Ações**:
+     - Alterar status (SCHEDULED → IN_PROGRESS → COMPLETED).
+     - Cancelar (Receptionist/Admin).
+     - Excluir (Apenas ADMIN).
 
 ## 🧪 Testes
 
