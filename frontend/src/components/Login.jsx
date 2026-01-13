@@ -18,7 +18,23 @@ export default function Login() {
       });
       
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('role', response.data.role); // Assuming role is returned or needed
+      try {
+        const token = response.data.token;
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        const payload = JSON.parse(jsonPayload);
+        const role =
+          payload.role ||
+          (Array.isArray(payload.roles) ? payload.roles[0] : undefined) ||
+          (Array.isArray(payload.authorities) ? (payload.authorities[0] || '').replace('ROLE_', '') : undefined) ||
+          '';
+        if (role) localStorage.setItem('role', role);
+      } catch (_) {
+        // ignore decode errors
+      }
       navigate('/dashboard');
     } catch (err) {
       setError('Falha no login. Verifique suas credenciais.');

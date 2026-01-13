@@ -37,11 +37,15 @@ export default function Dashboard() {
       }
     };
     const payload = parseJwt(token);
-    const roleFromPayload =
+    let roleFromPayload =
       payload.role ||
       (Array.isArray(payload.roles) ? payload.roles[0] : undefined) ||
       (Array.isArray(payload.authorities) ? (payload.authorities[0] || '').replace('ROLE_', '') : undefined) ||
       '';
+    if (!roleFromPayload) {
+      const storedRole = localStorage.getItem('role');
+      if (storedRole) roleFromPayload = storedRole;
+    }
     setUserRole(roleFromPayload);
 
     fetchAppointments();
