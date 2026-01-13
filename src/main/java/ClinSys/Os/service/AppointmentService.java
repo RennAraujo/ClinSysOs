@@ -8,6 +8,8 @@ import ClinSys.Os.domain.repository.AppointmentRepository;
 import ClinSys.Os.service.exception.BusinessException;
 import ClinSys.Os.service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,12 @@ import java.util.stream.Collectors;
 public class AppointmentService {
 
     private final AppointmentRepository repository;
+
+    private boolean hasRole(String role) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
+    }
 
     public AppointmentResponse create(AppointmentRequest request) {
         if (request.getDateTime().isBefore(LocalDateTime.now())) {
@@ -54,21 +62,38 @@ public class AppointmentService {
         var appointment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
 
-        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new BusinessException("Cannot update a completed appointment");
+        boolean isAdmin = hasRole("ADMIN");
+        boolean isDoctor = hasRole("DOCTOR");
+        boolean isReceptionist = hasRole("RECEPTIONIST");
+
+        // Rule: RECEPTIONIST cannot update completed appointments
+        if (isReceptionist && appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new BusinessException("Receptionists cannot update completed appointments");
         }
 
+        // Rule: DOCTOR can only update status
+        if (isDoctor) {
+            if (request.getStatus() != null) {
+                // Validate status transition (optional but good practice)
+                 if (appointment.getStatus() == AppointmentStatus.CANCELED && request.getStatus() != AppointmentStatus.CANCELED) {
+                     throw new BusinessException("Cannot reactivate a canceled appointment");
+                 }
+                appointment.setStatus(request.getStatus());
+            }
+            // Ignore other fields changes for DOCTOR
+            return mapToResponse(repository.save(appointment));
+        }
+
+        // For ADMIN and RECEPTIONIST (on non-completed), allow full update
+        
         if (request.getDateTime() != null && request.getDateTime().isBefore(LocalDateTime.now())) {
              throw new BusinessException("Cannot update appointment to a past date");
         }
 
-        // Status transition validation logic could go here
-        // For simplicity, we allow updates if not COMPLETED, but we should check target status
         if (request.getStatus() != null) {
              if (appointment.getStatus() == AppointmentStatus.CANCELED && request.getStatus() != AppointmentStatus.CANCELED) {
                  throw new BusinessException("Cannot reactivate a canceled appointment");
              }
-             // More rules as per requirements?
         }
 
         appointment.setPatientName(request.getPatientName());
@@ -88,10 +113,16 @@ public class AppointmentService {
         var appointment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
 
-        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new BusinessException("Cannot delete a completed appointment");
-        }
-
+        // Rule: ADMIN has full access, so we remove the block for COMPLETED if it's ADMIN
+        // But if logic was intended for everyone, we keep it. Requirement says "ADMIN Acesso total".
+        // Assuming "Acesso total" overrides "Cannot delete completed".
+        
+        // However, if we want to be safe, we might keep it. But user said "Acesso total".
+        // Let's remove the restriction for ADMIN.
+        // Since only ADMIN can call delete (enforced by Controller), we can remove the check entirely or check if user is admin (redundant).
+        // Wait, Controller has @PreAuthorize("hasRole('ADMIN')"). So ONLY ADMIN reaches here.
+        // So we should remove the "Cannot delete a completed appointment" check to fulfill "Acesso total".
+        
         repository.delete(appointment);
     }
 
