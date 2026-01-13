@@ -6,6 +6,7 @@ import ClinSys.Os.api.dto.RegisterRequest;
 import ClinSys.Os.domain.model.User;
 import ClinSys.Os.domain.repository.UserRepository;
 import ClinSys.Os.security.JwtService;
+import ClinSys.Os.service.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +22,9 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+        repository.findByUsername(request.getUsername()).ifPresent(u -> {
+            throw new BusinessException("User already exists");
+        });
         var user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))

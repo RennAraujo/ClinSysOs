@@ -2,17 +2,20 @@ package ClinSys.Os.api.exception;
 
 import ClinSys.Os.service.exception.BusinessException;
 import ClinSys.Os.service.exception.ResourceNotFoundException;
+import ClinSys.Os.domain.model.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -44,6 +47,20 @@ public class GlobalExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage())
         );
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleMessageNotReadable(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof InvalidFormatException ife) {
+            Class<?> targetType = ife.getTargetType();
+            if (targetType == Role.class && !ife.getPath().isEmpty()) {
+                Object invalidValue = ife.getValue();
+                String value = invalidValue == null ? "null" : invalidValue.toString();
+                return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid role: '" + value + "' is not a valid option.");
+            }
+        }
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Malformed request payload");
     }
 
     @ExceptionHandler(Exception.class)

@@ -31,6 +31,16 @@ services:
     networks:
       - clinsys-net
 
+  frontend:
+    build: ./frontend
+    container_name: clinsys-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
+    networks:
+      - clinsys-net
+
 networks:
   clinsys-net:
     driver: bridge

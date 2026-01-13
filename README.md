@@ -1,15 +1,23 @@
 # ClinSys - Medical Appointment Management System
 
-Sistema de gerenciamento de atendimentos para a clínica Vida Plena.
+Sistema de gerenciamento de atendimentos para a clínica Vida Plena, integrando Backend (Spring Boot) e Frontend (React).
 
 ## 🚀 Tecnologias
 
+### Backend
 - **Java 17**
 - **Spring Boot 3**
 - **PostgreSQL**
-- **Docker & Docker Compose**
 - **Spring Security + JWT**
 - **Swagger / OpenAPI**
+
+### Frontend
+- **React + Vite**
+- **Tailwind CSS**
+- **Nginx (Produção Docker)**
+
+### Infraestrutura
+- **Docker & Docker Compose**
 
 ## 🛠️ Configuração e Execução
 
@@ -18,13 +26,17 @@ Sistema de gerenciamento de atendimentos para a clínica Vida Plena.
 
 ### Executando a Aplicação (Recomendado)
 
-Para iniciar a aplicação e o banco de dados via Docker:
+Para iniciar todos os serviços (Backend, Frontend e Banco de Dados) via Docker:
 
 ```bash
 docker-compose up -d --build
 ```
 
-A API estará disponível em `http://localhost:8080`.
+Após a inicialização:
+
+- **Frontend (Painel)**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: `http://localhost:8080/api`
+- **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ### Documentação da API (Swagger)
 
@@ -34,40 +46,32 @@ Acesse a documentação interativa em:
 A especificação OpenAPI em formato JSON pode ser acessada em:
 👉 **http://localhost:8080/v3/api-docs**
 
-> **Nota:** O projeto utiliza SpringDoc OpenApi compatível com Spring Boot 3.3.x para garantir a geração correta da documentação.
-
 ## 🔐 Autenticação e Perfis
 
-O sistema utiliza JWT. Crie um usuário e faça login para obter o token.
+O sistema utiliza JWT. O primeiro passo é criar um usuário (ou usar um existente) e fazer login.
+
+### Perfis de Acesso
 
 | Perfil | Permissões |
 |--------|------------|
-| **ADMIN** | Acesso total (Criar, Listar, Editar, Remover). |
+| **ADMIN** | Acesso total (Criar, Listar, Editar, Remover, Alterar Status). |
 | **RECEPTIONIST** | Criar e Listar. Não pode remover ou editar finalizados. |
 | **DOCTOR** | Listar e Atualizar Status. Não pode criar ou remover. |
 
-### Exemplo de Fluxo
+### Fluxo de Uso (Frontend)
 
-1. **Registrar Usuário**:
-   `POST /api/auth/register`
-   ```json
-   {
-     "username": "admin",
-     "password": "123",
-     "role": "ADMIN"
-   }
-   ```
-
-2. **Login**:
-   `POST /api/auth/login`
-   - Copie o `token` da resposta.
-
-3. **Usar a API**:
-   - No Swagger, clique em **Authorize** e insira: `Bearer <SEU_TOKEN>`.
+1. Acesse [http://localhost:3000](http://localhost:3000).
+2. Clique em "Criar conta" para registrar um novo usuário (ex: `admin` / role `ADMIN`).
+3. Faça login com as credenciais criadas.
+4. No Dashboard, você poderá:
+   - Criar novos agendamentos.
+   - Visualizar a lista de agendamentos.
+   - Alterar o status (SCHEDULED → IN_PROGRESS → COMPLETED).
+   - Excluir agendamentos (Apenas ADMIN).
 
 ## 🧪 Testes
 
-Para executar os testes unitários (requer Java/Maven local):
+Para executar os testes unitários e de integração do Backend (requer Java/Maven local):
 
 ```bash
 ./mvnw test

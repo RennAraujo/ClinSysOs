@@ -47,3 +47,11 @@ Thumbs.db
 .env.local
 .env.*
 !.env.example
+
+### Frontend ###
+frontend/node_modules
+frontend/dist
+frontend/dist-ssr
+frontend/*.local
+frontend/.npm
+frontend/.yarn
