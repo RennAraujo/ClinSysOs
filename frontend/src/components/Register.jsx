@@ -17,10 +17,10 @@ export default function Register() {
         password,
         role
       });
-      alert('Cadastro realizado com sucesso! Faça login.');
+      alert('Registration successful! Please login.');
       navigate('/login');
     } catch (err) {
-      setError('Falha no cadastro. Tente novamente.');
+      setError('Registration failed. Try again.');
     }
   };
 

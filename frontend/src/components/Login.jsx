@@ -37,7 +37,7 @@ export default function Login() {
       }
       navigate('/dashboard');
     } catch (err) {
-      setError('Falha no login. Verifique suas credenciais.');
+      setError('Login failed. Check your credentials.');
     }
   };
 

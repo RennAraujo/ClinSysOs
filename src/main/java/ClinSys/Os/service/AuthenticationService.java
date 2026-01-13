@@ -15,12 +15,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Service class for handling user authentication and registration.
+ */
 public class AuthenticationService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Registers a new user in the system.
+     *
+     * @param request The registration request containing username, password, and role.
+     * @return The authentication response containing the JWT token.
+     * @throws BusinessException if the username already exists.
+     */
     public AuthenticationResponse register(RegisterRequest request) {
         repository.findByUsername(request.getUsername()).ifPresent(u -> {
             throw new BusinessException("User already exists");
@@ -39,6 +49,12 @@ public class AuthenticationService {
                 .build();
     }
 
+    /**
+     * Authenticates a user.
+     *
+     * @param request The login request containing username and password.
+     * @return The authentication response containing the JWT token.
+     */
     public AuthenticationResponse authenticate(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

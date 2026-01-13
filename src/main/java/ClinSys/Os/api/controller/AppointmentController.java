@@ -20,7 +20,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
-@Tag(name = "Appointments", description = "Endpoints para gerenciamento de atendimentos")
+@Tag(name = "Appointments", description = "Endpoints for appointment management")
 @SecurityRequirement(name = "bearer-key")
 public class AppointmentController {
 
@@ -28,7 +28,7 @@ public class AppointmentController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST')")
-    @Operation(summary = "Criar atendimento", description = "Cadastra um novo atendimento (Status inicial: SCHEDULED)")
+    @Operation(summary = "Create appointment", description = "Registers a new appointment (Initial status: SCHEDULED)")
     public ResponseEntity<AppointmentResponse> create(@RequestBody @Valid AppointmentRequest request) {
         var response = service.create(request);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -40,21 +40,21 @@ public class AppointmentController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST', 'DOCTOR')")
-    @Operation(summary = "Listar atendimentos", description = "Retorna todos os atendimentos cadastrados")
+    @Operation(summary = "List appointments", description = "Returns all registered appointments")
     public ResponseEntity<List<AppointmentResponse>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST', 'DOCTOR')")
-    @Operation(summary = "Buscar atendimento por ID", description = "Retorna os detalhes de um atendimento específico")
+    @Operation(summary = "Find appointment by ID", description = "Returns details of a specific appointment")
     public ResponseEntity<AppointmentResponse> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST', 'DOCTOR')")
-    @Operation(summary = "Atualizar atendimento", description = "Atualiza dados de um atendimento existente")
+    @Operation(summary = "Update appointment", description = "Updates data of an existing appointment")
     public ResponseEntity<AppointmentResponse> update(
             @PathVariable UUID id,
             @RequestBody @Valid AppointmentRequest request
@@ -64,7 +64,7 @@ public class AppointmentController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Remover atendimento", description = "Remove um atendimento (apenas se não estiver finalizado)")
+    @Operation(summary = "Delete appointment", description = "Removes an appointment")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

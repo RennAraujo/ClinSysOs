@@ -86,7 +86,7 @@ export default function Dashboard() {
       });
       fetchAppointments();
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Erro ao cancelar agendamento.';
+      const msg = err?.response?.data?.message || 'Error cancelling appointment.';
       alert(msg);
     }
   };
@@ -107,7 +107,7 @@ export default function Dashboard() {
       });
       fetchAppointments();
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Erro ao alterar status.';
+      const msg = err?.response?.data?.message || 'Error updating status.';
       alert(msg);
     }
   };
@@ -120,7 +120,7 @@ export default function Dashboard() {
       });
       fetchAppointments();
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Erro ao excluir agendamento.';
+      const msg = err?.response?.data?.message || 'Error deleting appointment.';
       alert(msg);
     }
   };
@@ -143,7 +143,7 @@ export default function Dashboard() {
       setNewDate('');
       fetchAppointments();
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Erro ao criar agendamento.';
+      const msg = err?.response?.data?.message || 'Error creating appointment.';
       alert(msg);
     }
   };
@@ -153,7 +153,7 @@ export default function Dashboard() {
     localStorage.removeItem('role');
     navigate('/login');
   };
-  const handleAgendarClick = () => {
+  const handleScheduleClick = () => {
     if (formRef.current) {
       formRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -162,12 +162,12 @@ export default function Dashboard() {
     }
   };
 
-  // Definição de permissões baseada no perfil (Role)
+  // Role-based permission definition
   const canCreate = userRole === 'ADMIN' || userRole === 'RECEPTIONIST';
-  const canDelete = userRole === 'ADMIN'; // Apenas ADMIN remove atendimentos
+  const canDelete = userRole === 'ADMIN'; // Only ADMIN can delete appointments
   const canUpdateStatus = (status) => {
-    if (userRole === 'ADMIN') return true; // ADMIN tem acesso total
-    if (userRole === 'DOCTOR') return status !== 'COMPLETED'; // DOCTOR atualiza status até finalizar
+    if (userRole === 'ADMIN') return true; // ADMIN has full access
+    if (userRole === 'DOCTOR') return status !== 'COMPLETED'; // DOCTOR updates status until completion
     return false;
   };
 
@@ -178,7 +178,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-blue-600">Clínica Vida Plena - Painel</h1>
           <div className="flex items-center gap-3">
             {canCreate && (
-              <button onClick={handleAgendarClick} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+              <button onClick={handleScheduleClick} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                 Agendar
               </button>
             )}

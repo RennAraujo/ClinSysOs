@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication", description = "Endpoints para autenticação e registro de usuários")
+@Tag(name = "Authentication", description = "Endpoints for authentication and user registration")
 public class AuthenticationController {
 
     private final AuthenticationService service;
 
     @PostMapping("/register")
-    @Operation(summary = "Registrar novo usuário", description = "Cria um novo usuário com o perfil especificado")
+    @Operation(summary = "Register new user", description = "Creates a new user with the specified role")
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
     ) {
@@ -30,7 +30,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Autenticar usuário", description = "Autentica usuário e retorna token JWT")
+    @Operation(summary = "Authenticate user", description = "Authenticates user and returns JWT token")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody LoginRequest request
     ) {
