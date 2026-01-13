@@ -79,6 +79,9 @@ public class AppointmentService {
 
         // Rule: DOCTOR can only update status
         if (isDoctor) {
+            if (request.getStatus() == AppointmentStatus.CANCELED) {
+                throw new BusinessException("Doctors cannot cancel appointments");
+            }
             if (request.getStatus() != null) {
                 // Validate status transition (optional but good practice)
                  if (appointment.getStatus() == AppointmentStatus.CANCELED && request.getStatus() != AppointmentStatus.CANCELED) {

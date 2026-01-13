@@ -161,8 +161,7 @@ export default function Dashboard() {
   const canCreate = userRole === 'ADMIN' || userRole === 'RECEPTIONIST';
   const canDelete = userRole === 'ADMIN';
   const canUpdateStatus = (status) => {
-    if (userRole === 'ADMIN') return true;
-    if (userRole === 'RECEPTIONIST') return status !== 'COMPLETED';
+    if (userRole === 'ADMIN') return status !== 'COMPLETED';
     if (userRole === 'DOCTOR') return status !== 'COMPLETED';
     return false;
   };
@@ -230,21 +229,22 @@ export default function Dashboard() {
                       </span>
                     </td>
                     <td className="border-b p-2 space-x-2">
-                      {userRole === 'RECEPTIONIST' ? (
-                        <button
-                          onClick={() => handleCancel(app)}
-                          className="px-2 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600 disabled:opacity-50"
-                          disabled={app.status === 'COMPLETED' || app.status === 'CANCELED'}
-                        >
-                          Cancelar
-                        </button>
-                      ) : (
+                      {(userRole === 'ADMIN' || userRole === 'DOCTOR') && (
                         <button
                           onClick={() => handleChangeStatus(app)}
                           className="px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:opacity-50"
                           disabled={!canUpdateStatus(app.status) || app.status === 'COMPLETED' || app.status === 'CANCELED'}
                         >
                           Alterar status
+                        </button>
+                      )}
+                      {(userRole === 'ADMIN' || userRole === 'RECEPTIONIST') && (
+                        <button
+                          onClick={() => handleCancel(app)}
+                          className="px-2 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600 disabled:opacity-50"
+                          disabled={app.status === 'COMPLETED' || app.status === 'CANCELED'}
+                        >
+                          Cancelar
                         </button>
                       )}
                       <button
