@@ -4,7 +4,7 @@ Sistema de gerenciamento de atendimentos para a clínica Vida Plena.
 
 ## 🚀 Tecnologias
 
-- **Java 21**
+- **Java 17**
 - **Spring Boot 3**
 - **PostgreSQL**
 - **Docker & Docker Compose**
