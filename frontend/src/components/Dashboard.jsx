@@ -162,11 +162,12 @@ export default function Dashboard() {
     }
   };
 
+  // Definição de permissões baseada no perfil (Role)
   const canCreate = userRole === 'ADMIN' || userRole === 'RECEPTIONIST';
-  const canDelete = userRole === 'ADMIN';
+  const canDelete = userRole === 'ADMIN'; // Apenas ADMIN remove atendimentos
   const canUpdateStatus = (status) => {
-    if (userRole === 'ADMIN') return status !== 'COMPLETED';
-    if (userRole === 'DOCTOR') return status !== 'COMPLETED';
+    if (userRole === 'ADMIN') return true; // ADMIN tem acesso total
+    if (userRole === 'DOCTOR') return status !== 'COMPLETED'; // DOCTOR atualiza status até finalizar
     return false;
   };
 

@@ -66,6 +66,9 @@ public class AppointmentService {
         boolean isDoctor = hasRole("DOCTOR");
         boolean isReceptionist = hasRole("RECEPTIONIST");
 
+        // Regras de negócio por perfil (Role-based access control)
+        
+        // RECEPTIONIST: Pode cadastrar/consultar, mas não pode alterar finalizados.
         if (isReceptionist) {
             if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
                 throw new BusinessException("Receptionists cannot update completed appointments");
