@@ -80,3 +80,12 @@ Para executar os testes unitários e de integração do Backend (requer Java/Mav
 ```bash
 ./mvnw test
 ```
+
+## 🔄 Recent Updates (Changelog)
+
+- **UI Improvements**:
+  - **New Column**: Added "Especialidade" (Specialty) to the appointments table.
+  - **Layout**: Improved table alignment and responsiveness with `whitespace-nowrap` for dates.
+  - **UX**: The top "Agendar" button now handles form submission with validation feedback.
+  - **Cleanup**: Removed redundant action buttons to streamline the interface.
+  - **Fix**: Resolved sorting stability issues when updating appointment status.
